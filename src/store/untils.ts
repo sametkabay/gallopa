@@ -73,9 +73,8 @@ export const useRaceSimulator = (store: any) => {
 
       const currentResults = store.getters.getCurrentRoundResult
       const horsesWithCondition = store.getters.getHorsesWithCondition
-      const speed = store.getters.getSpeed
 
-      const { updatedResults, finishedHorses } = updateHorseDistances(
+      const { updatedResults } = updateHorseDistances(
         currentResults,
         horsesWithCondition,
         currentRound
