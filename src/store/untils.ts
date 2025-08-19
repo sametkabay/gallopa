@@ -62,9 +62,9 @@ export const useRaceSimulator = (store: any) => {
   let raceInterval: number | null = null
 
   const startRaceSimulation = () => {
-    if (raceInterval) return
+    if (raceInterval !== null) return
 
-    raceInterval = setInterval(() => {
+    raceInterval = window.setInterval(() => {
       const isStarted = store.getters.getIsStarted
       const roundFinished = store.getters.getRoundFinished
       const currentRound = store.getters.getCurrentRound
