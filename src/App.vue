@@ -21,77 +21,78 @@ const setSpeed = (speed: number) => {
 
 <template>
   <div class="app">
-    <div class="horse-list">
-      <HorseList />
+    <div class="app-header">
+      <h1>Gallopa</h1>
     </div>
-    <div class="arena-wrapper">
-      <Arena :horses="getRoundHorses(store.state.currentRound)" :isStarted="store.state.isStarted" />
-      <div class="actions">
-        <v-btn 
-          v-if="store.state.currentRound <= 6 && !store.state.roundFinished" 
-          variant="tonal" 
-          @click="store.dispatch('startPauseRace')"
-        >
-          {{ store.state.isStarted ? 'Pause' : 'Start Round ' + store.state.currentRound }}
-        </v-btn>
-        <v-btn variant="tonal" @click="store.dispatch('resetRace')">Reset</v-btn>
+    <div class="app-body">
+      <div class="horse-list">
+        <HorseList />
       </div>
-      <div class="speed-controls">
-        <v-btn 
-          variant="tonal" 
-          :color="currentSpeed === SpeedType.MEDIUM ? 'primary' : undefined"
-          :disabled="store.state.isStarted"
-          @click="setSpeed(SpeedType.MEDIUM)"
-        >
-          Medium
-        </v-btn>
-        <v-btn 
-          variant="tonal" 
-          :color="currentSpeed === SpeedType.FAST ? 'primary' : undefined"
-          :disabled="store.state.isStarted"
-          @click="setSpeed(SpeedType.FAST)"
-        >
-          Fast
-        </v-btn>
-        <v-btn 
-          variant="tonal" 
-          :color="currentSpeed === SpeedType.VERY_FAST ? 'primary' : undefined"
-          :disabled="store.state.isStarted"
-          @click="setSpeed(SpeedType.VERY_FAST)"
-        >
-          Very Fast
-        </v-btn>
+      <div class="arena-wrapper">
+        <Arena :horses="getRoundHorses(store.state.currentRound)" :isStarted="store.state.isStarted" />
+        <div class="actions">
+          <v-btn v-if="store.state.currentRound <= 6 && !store.state.roundFinished" variant="tonal"
+            @click="store.dispatch('startPauseRace')">
+            {{ store.state.isStarted ? 'Pause' : 'Start Round ' + store.state.currentRound }}
+          </v-btn>
+          <v-btn variant="tonal" @click="store.dispatch('resetRace')">Reset</v-btn>
+        </div>
+        <div class="speed-controls">
+          <v-btn variant="tonal" :color="currentSpeed === SpeedType.MEDIUM ? 'primary' : undefined"
+            :disabled="store.state.isStarted" @click="setSpeed(SpeedType.MEDIUM)">
+            Medium
+          </v-btn>
+          <v-btn variant="tonal" :color="currentSpeed === SpeedType.FAST ? 'primary' : undefined"
+            :disabled="store.state.isStarted" @click="setSpeed(SpeedType.FAST)">
+            Fast
+          </v-btn>
+          <v-btn variant="tonal" :color="currentSpeed === SpeedType.VERY_FAST ? 'primary' : undefined"
+            :disabled="store.state.isStarted" @click="setSpeed(SpeedType.VERY_FAST)">
+            Very Fast
+          </v-btn>
+        </div>
       </div>
-    </div>
-    <div class="round-list">
-      <RoundList />
+      <div class="round-list">
+        <RoundList />
+      </div>
     </div>
   </div>
-  </template>
+</template>
 
 <style scoped>
-  .app {
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.app-body {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  gap: 32px;
+
+  .arena-wrapper {
     display: flex;
-    justify-content: center;
-    width: 100%;
-    gap: 32px;
+    flex-direction: column;
+    gap: 16px;
 
-    .arena-wrapper {
+    .actions {
       display: flex;
-      flex-direction: column;
       gap: 16px;
+      justify-content: center;
+    }
 
-      .actions {
-        display: flex;
-        gap: 16px;
-        justify-content: center;
-      }
-
-      .speed-controls {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
-      }
+    .speed-controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
     }
   }
+}
 </style>

@@ -59,7 +59,7 @@ button:focus-visible {
 }
 
 #app {
-  margin: 64px auto;
+  margin: 0 auto;
   width: 100%;
 }
 
