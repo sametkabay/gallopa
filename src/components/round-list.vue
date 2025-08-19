@@ -19,8 +19,13 @@
           <div class="results-list">
             <h4>Results</h4>
             <ul>
-              <li v-for="i in 10" :key="i" class="result-placeholder">
-                Place {{ i }}: TBD
+              <li v-for="i in 10" :key="i" class="result-item">
+                <span v-if="getCurrentPosition(round.id, i)" :class="getCurrentPositionClass(round.id, i)">
+                  {{ i }}. {{ getCurrentPosition(round.id, i) }}
+                </span>
+                <span v-else class="result-placeholder">
+                  Place {{ i }}
+                </span>
               </li>
             </ul>
           </div>
@@ -40,8 +45,47 @@ const store = useStore()
 const rounds = computed(() => roundList)
 const selectedHorse = computed(() => store.getters.getSelectedHorse)
 
+
 const getRoundHorses = (roundId: number) => {
   return store.getters.getRoundHorses(roundId)
+}
+
+
+const getCurrentPosition = (roundId: number, position: number) => {
+  const finishedOrder = store.getters.getFinishedOrder(roundId)
+  const roundResults = store.state.result[roundId] || []
+  
+  if (position <= finishedOrder.length) {
+    const finishedHorseId = finishedOrder[position - 1]
+    const horse = getRoundHorses(roundId).find((h: any) => h.id === finishedHorseId)
+    const result = horse ? horse.name : 'Unknown'
+    console.log(`Position ${position}: Finished horse - ${result}`)
+    return result
+  }
+  
+  const ongoingHorses = roundResults
+    .filter((result: any) => !result.isFinished)
+    .sort((a: any, b: any) => b.distance - a.distance)
+  
+  const ongoingIndex = position - finishedOrder.length - 1
+  
+  if (ongoingIndex >= 0 && ongoingIndex < ongoingHorses.length) {
+    const ongoingHorse = ongoingHorses[ongoingIndex]
+    const horse = getRoundHorses(roundId).find((h: any) => h.id === ongoingHorse.horseId)
+    return horse ? horse.name : 'Unknown'
+  }
+  
+  return null
+}
+
+const getCurrentPositionClass = (roundId: number, position: number) => {
+  const finishedOrder = store.getters.getFinishedOrder(roundId)
+  
+  if (position <= finishedOrder.length) {
+    return 'result-completed'
+  } else {
+    return 'result-ongoing'
+  }
 }
 
 const isSelectedHorse = (horseId: string) => {
@@ -127,5 +171,20 @@ li:last-child {
 .result-placeholder {
   color: #999;
   font-style: italic;
+}
+
+.result-completed {
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.result-ongoing {
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
 }
 </style>

@@ -2,11 +2,18 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import type { HorseWithCondition } from '../model/horse'
+import InfoBox from './info-box.vue'
 
 const store = useStore()
 
 const horsesWithCondition = computed(() => store.getters.getHorsesWithCondition)
 const selectedHorse = computed(() => store.getters.getSelectedHorse)
+const currentRound = computed(() => store.getters.getCurrentRound)
+const currentRoundHorses = computed(() => store.getters.getRoundHorses(currentRound.value))
+
+const isHorseInCurrentRound = (horseId: string) => {
+  return currentRoundHorses.value.some((horse: any) => horse.id === horseId)
+}
 
 const selectHorse = (horse: HorseWithCondition) => {
   if (selectedHorse.value?.id === horse.id) {
@@ -29,7 +36,10 @@ const selectHorse = (horse: HorseWithCondition) => {
         <v-list-item
           v-for="horse in horsesWithCondition"
           :key="horse.id"
-          :class="{ 'selected-horse': selectedHorse?.id === horse.id }"
+          :class="{ 
+            'selected-horse': selectedHorse?.id === horse.id,
+            'current-round-horse': isHorseInCurrentRound(horse.id)
+          }"
           @click="selectHorse(horse)"
           class="horse-item"
         >
@@ -61,8 +71,11 @@ const selectHorse = (horse: HorseWithCondition) => {
           </template>
 
         </v-list-item>
+        <InfoBox />
       </v-list>
+
     </v-card-text>
+
   </v-card>
 </template>
 
@@ -85,6 +98,7 @@ const getConditionColor = (condition: number): string => {
 .horse-list {
   max-height: 600px;
   overflow-y: auto;
+  padding-bottom: 64px;
 }
 
 .horse-item {
@@ -104,8 +118,12 @@ const getConditionColor = (condition: number): string => {
   border-left: 4px solid rgb(var(--v-theme-primary));
 }
 
+.current-round-horse .horse-name {
+  font-weight: 700;
+}
+
 .horse-name {
-  font-weight: 600;
+  font-weight: 400;
   font-size: 1rem;
 }
 

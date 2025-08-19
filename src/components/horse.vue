@@ -1,12 +1,14 @@
 <template>
-  <div class="horse-container">
-    <Vue3Lottie
+  <div class="horse-container" :style="props.style" @click="selectHorse">
+    <div class="horse-container-inner">
+      <Vue3Lottie
       :animation-data="modifiedAnimationData"
-      :loop="isRunning"
-      :autoplay="isRunning"
+      :loop="shouldLoop"
+      :autoplay="shouldAutoplay"
       :height="horseHeight"
       @DOMLoaded="onAnimationLoaded"
     />
+    </div>
   </div>
 </template>
 
@@ -19,6 +21,7 @@ interface Props {
   colorCode?: number[]
   isRunning?: boolean
   horseId?: string
+  style?: any
 }
 
 interface LottieInstance {
@@ -32,16 +35,43 @@ const store = useStore()
 const props = withDefaults(defineProps<Props>(), {
   colorCode: () => [1, 1, 1, 1],
   isRunning: true,
-  horseId: ''
+  horseId: '',
+  style: {}
 })
 
 const originalAnimationData = ref<any | null>(null)
 const lottieInstance = ref<LottieInstance | null>(null)
 
 const selectedHorse = computed(() => store.getters.getSelectedHorse)
+const currentRoundResult = computed(() => store.getters.getCurrentRoundResult)
+const horsesWithCondition = computed(() => store.getters.getHorsesWithCondition)
+
+const horseResult = computed(() => {
+  return currentRoundResult.value.find((result: any) => result.horseId === props.horseId)
+})
+
+const isFinished = computed(() => {
+  return horseResult.value?.isFinished || false
+})
+
+const shouldLoop = computed(() => {
+  return props.isRunning && !isFinished.value
+})
+
+const shouldAutoplay = computed(() => {
+  return props.isRunning && !isFinished.value
+})
+
 const horseHeight = computed(() => {
   return selectedHorse.value?.id === props.horseId ? 50 : 40
 })
+
+const selectHorse = () => {
+  const horse = horsesWithCondition.value.find((h: any) => h.id === props.horseId)
+  if (horse) {
+    store.dispatch('selectHorse', horse)
+  }
+}
 
 const modifiedAnimationData = computed(() => {
   if (!originalAnimationData.value) return null
@@ -82,7 +112,7 @@ const loadAnimationData = async () => {
   }
 }
 
-watch(() => props.isRunning, (newValue) => {
+watch(() => shouldAutoplay.value, (newValue) => {
   if (lottieInstance.value) {
     if (newValue) {
       lottieInstance.value.play()
@@ -105,10 +135,19 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.horse-container {
+.horse-container-inner {
   display: flex;
   justify-content: center;
   align-items: center;
   transform: scaleX(-1);
+}
+
+.horse-container {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.horse-container:hover {
+  transform: scale(1.05);
 }
 </style>

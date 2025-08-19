@@ -1,20 +1,34 @@
 <template>
   <div class="arena">
     <div class="lines">
-      <Line v-for="horse in props.horses" :key="horse.id" :colorCode="horse.colorCode" :isRunning="props.isStarted" :horseId="horse.id" />
+      <Line v-for="horse in props.horses" :key="horse.id" :colorCode="horse.colorCode" :isRunning="isRunning" :horseId="horse.id" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
 import Line from './line.vue'
 import type { Horse } from '../model/horse'
+import { useRaceSimulator } from '../store/untils'
+
+const store = useStore()
 
 const props = defineProps<{
   horses: Horse[]
   isStarted: boolean
 }>()
 
+const isRunning = computed(() => {
+  return store.getters.getIsStarted && !store.getters.getRoundFinished
+})
+
+const { watchRaceState } = useRaceSimulator(store)
+
+onMounted(() => {
+  watchRaceState()
+})
 </script>
 
 <style scoped>
